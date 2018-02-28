@@ -1,0 +1,85 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>
+
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>
+
+<form method="get" action="/postings/add" type="btn-group" class="btn btn-light">
+	<input type="submit" name="create" value="Create">
+</form>
+
+
+<!--<table width='80%' border=0>-->
+<table class="table table-hover">
+	<thead class="thead-dark">
+	<!--<tr style='text-align:left; background-color:#CCC'>-->
+		<tr>
+			<th scope="col">Job ID</th>
+			<th scope="col">Job Title</th>
+			<th scope="col">Job Description</th>
+			<th scope="col">Location</th>
+			<th scope="col">Posted Date</th>
+			<th scope="col">Action</th>
+		</tr>
+	</thead>
+	<!--
+		Using FOREACH LOOP for the postings array
+		myArray.forEach(function(el, index) {
+			// el - current element, i - index
+		});
+	-->
+	<% if (data) { %>
+	<% data.forEach(function(posting){ %>
+		<tbody>
+			<tr>
+				<td><%= posting.job_id %></td>
+				<td><%= posting.job_title %></td>
+				<td><%= posting.job_description %></td>
+				<td><%= posting.location %></td>
+				<td><%= posting.posted_date.toUTCString().split(' ').slice(0, 5).join(' ') %></td>
+				<td>
+
+				<div class="btn-group" role="group" aria-label="Basic example">
+					<button type="button" class="btn btn-light"><a href='/postings/edit/<%= posting.job_id %>'>Edit</button>
+					<form method="post" action="/postings/delete/<%= posting.job_id %>" type="btn-group" class="btn btn-light">
+						<input type="submit" name="delete" value='Delete' onClick="return confirm('Are you sure you want to delete?')">
+						<input type="hidden" name="_method" value="DELETE">
+					</form>
+					<form method="get" action="/applicants/add" method="get" type="btn-group" class="btn btn-light">
+						<input type="submit" name="apply" value="Apply">
+						<input type="hidden" name='job_id' value="<%= posting.job_id %>">
+					</form>
+				</div>
+
+<!--
+				<div style="float:left">
+					<a href='/postings/edit/<%= posting.job_id %>'>Edit</a>
+					<form method="post" action="/postings/delete/<%= posting.job_id %>">
+						<input type="submit" name="delete" value='Delete' onClick="return confirm('Are you sure you want to delete?')" style="float:right"/>
+						<input type="hidden" name="_method" value="DELETE">
+					</form>
+					<form method="get" action="/applicants/add" style="float:right">
+        		<input type="submit" name="apply" value="Apply">
+						<input type="hidden" name='job_id' value="<%= posting.job_id %>">
+        	</form>
+				</div>
+-->
+				</td>
+			</tr>
+		</tbody>
+	<% }) %>
+	<% } %>
+
+</table>
+</div><!--container class-->
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>

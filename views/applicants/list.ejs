@@ -1,0 +1,65 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>
+
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>
+
+<table class="table table-hover">
+	<thead class="thead-dark">
+		<tr>
+			<th scope="col">ID</th>
+			<th scope="col">First name</th>
+			<th scope="col">Last name</th>
+			<th scope="col">Email</th>
+			<th scope="col">Phone</th>
+			<th scope="col">Applied Job ID</th>
+			<th scope="col">Applied Date</th>
+			<th scope="col">Action</th>
+		</tr>
+	</thead>
+
+	<!--
+		Using FOREACH LOOP for the applicants array
+
+		myArray.forEach(function(el, index) {
+			// el - current element, i - index
+		});
+	-->
+	<% if (data) { %>
+	<% data.forEach(function(applicant){ %>
+		<tbody>
+		  <tr>
+		    <td><%= applicant.applicant_id %></td>
+		    <td><%= applicant.first_name %></td>
+		    <td><%= applicant.last_name %></td>
+		    <td><%= applicant.email %></td>
+		    <td><%= applicant.phone %></td>
+		    <td><%= applicant.job_id %></td>
+		    <td><%= applicant.applied_date.toUTCString().split(' ').slice(0, 5).join(' ')%></td>
+		    <td>
+		    <div class="btn-group" role="group" aria-label="Basic example">
+		      <button type="button" class="btn btn-light"><a href='/applicants/edit/<%= applicant.applicant_id %>'>Edit</button>
+		      <form method="post" action="/applicants/delete/<%= applicant.applicant_id %>" type="btn-group" class="btn btn-light">
+		        <input type="submit" name="delete" value='Delete' onClick="return confirm('Are you sure you want to delete?')" />
+		        <input type="hidden" name="_method" value="DELETE" />
+		      </form>
+		    </div>
+		    </td>
+		  </tr>
+		  </tbody>
+
+	<% }) %>
+	<% } %>
+</table>
+</div><!--container class-->
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>
