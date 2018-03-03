@@ -7,114 +7,103 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 var data =null;
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicants', (err, result) => {
-      // ... error checks
-
-      console.dir(result.recordsets)
-      data=result.recordsets[0];
-
+  .query('select * from applicantTable', (err, result) => {
       console.dir(data);
-
-        res.render('applicants/list', {
-            title: 'Applicants List',
-            data: data,
-            messages: {
-              success: util.test(123),
-              error: null
-            }
-        })
-
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+      } else {
+        console.dir(result.recordsets)
+        data=result.recordsets[0];
+        console.dir(data);
+        res.send(data);
+//        res.sendStatus(200);
+      }
   })
 });
 
-router.get('/edit/(:applicant_id)', function(req, res, next){
+router.get('/(:applicant_id)', function(req, res, next){
 
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicants WHERE applicant_id = ' + req.params.applicant_id, (err, result) => {
-    var rows=result.recordsets[0];
-    res.render('applicants/edit', {
-		    title: 'Edit Applicants',
-		    //data: rows[0],
-		    applicant_id: rows[0].applicant_id,
-		    first_name: rows[0].first_name,
-		    last_name: rows[0].last_name,
-		    email: rows[0].email,
-		    phone: rows[0].phone,
-        messages: {
-          success: util.test(123),
-          error: null
-        }
-		})
+  .query('select * from applicantTable WHERE applicantID = ' + req.params.applicant_id, (err, result) => {
+
+          if (err) {
+            console.log(err);
+            res.sendStatus(500);
+          } else {
+            console.dir(result.recordsets)
+            data=result.recordsets[0];
+            console.dir(data);
+            res.send(data);
+    //        res.sendStatus(200);
+          }
   })
 
 });
 
-router.post('/edit/(:applicant_id)', function(req, res, next) {
+/*
+{
+  applicantID: 123,
+  applicantName: 'joe',
+  applciantExpectedSalary: 1000
+  applicantPhotoLink: 'http://test.com/123.png',
+  applicationStatus :'ok'
+}
 
-  console.log(req.param('first_name'));
+*/
+
+router.post('/', function(req, res, next) {
+
+  console.log(req.body);
 //  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
-
-var q="Update applicants SET first_name='"+req.param("first_name")+"', last_name='"+req.param("last_name")+"', phone='"+req.param("phone")+"', email='"+req.param("email")+"' where applicant_id='"+req.param("applicant_id")+"'";
+  var appl=req.body;
+var q="Insert into applicantTable values ('"+appl.applicantName+"',"+appl.applciantExpectedSalary+",'"+appl.applicantPhotoLink+"','"+appl.applicationStatus+"')";
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
-    console.log(err);
-    console.log(result.rowsAffected);
+    if (err) {
+      console.log(err);
+      res.sendStatus(500);
+    } else {
+      console.log(result.rowsAffected+' rows added');
+      res.sendStatus(200);
+    }
   });
-
-
-
-    var data =null;
-    util.connectionPool.request() // or: new sql.Request(pool1)
-    .query('select * from applicants', (err, result) => {
-        // ... error checks
-
-        console.dir(result.recordsets)
-        data=result.recordsets[0];
-
-        console.dir(data);
-
-          res.render('applicants/list', {
-              title: 'Applicants List',
-              data: data,
-              messages: {
-                success: "Data updated!",
-                error: null
-              }
-          })
-
-    })
-
 });
 
-router.post('/delete/(:applicant_id)', function(req, res, next) {
+router.post('/(:applicantID)', function(req, res, next) {
+
+  console.log(req.body);
+//  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
+  var appl=req.body;
+var q="Update applicantTable SET applciantExpectedSalary="+appl.applciantExpectedSalary+", applicantName='"+appl.applicantName+"', applicantPhotoLink='"+appl.applicantPhotoLink+"', applicationStatus='"+appl.applicationStatus+"' where applicantID='"+req.param("applicantID")+"'";
+console.log(q);
+  util.connectionPool.request() // or: new sql.Request(pool1)
+  .query(q, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(500);
+    } else {
+      console.log(result.rowsAffected+' rows updated');
+      res.sendStatus(200);
+    }
+  });
+});
+
+router.delete('/(:applicantID)', function(req, res, next) {
 
 
     util.connectionPool.request() // or: new sql.Request(pool1)
-    .query("DELETE FROM applicants WHERE applicant_id = '" + req.params.applicant_id+"'", (err, result) => {
-      console.log(err);
-      console.log(result.rowsAffected);
+    .query("DELETE FROM applicantTable WHERE applicantID = '" + req.params.applicantID+"'", (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+      } else {
+        console.log(result.rowsAffected+' rows deleted');
+        res.sendStatus(200);
+      }
+
     });
 
-    var data =null;
-    util.connectionPool.request() // or: new sql.Request(pool1)
-    .query('select * from applicants', (err, result) => {
-        // ... error checks
-
-        console.dir(result.recordsets)
-        data=result.recordsets[0];
-
-        console.dir(data);
-
-          res.render('applicants/list', {
-              title: 'Applicants List',
-              data: data,
-              messages: {
-                success: "Data deleted!",
-                error: null
-              }
-          })
-
-    })
 })
 module.exports = router;
