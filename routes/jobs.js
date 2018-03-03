@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 var data =null;
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicantTable', (err, result) => {
+  .query('select * from jobTable', (err, result) => {
       console.dir(data);
       if (err) {
         console.log(err);
@@ -22,10 +22,10 @@ var data =null;
   })
 });
 
-router.get('/(:applicant_id)', function(req, res, next){
+router.get('/(:jobID)', function(req, res, next){
 
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicantTable WHERE applicantID = ' + req.params.applicant_id, (err, result) => {
+  .query('select * from jobTable WHERE jobID = ' + req.params.jobID, (err, result) => {
 
           if (err) {
             console.log(err);
@@ -43,11 +43,13 @@ router.get('/(:applicant_id)', function(req, res, next){
 
 /*
 {
-  "applicantID": null,
-  "applicantName": "john",
-  "applciantExpectedSalary": 12000,
-  "applicantPhotoLink": "http://test.com/123.png",
-  "applicationStatus" :"PENDING"
+  "jobID": null,
+  "jobTitle": "janitor",
+  "location": "apac",
+  "category": "slave category",
+  "jobType" :"slave",
+  "jobDescription": "good job",
+  "jobURL": "http://jobstreet.com/1234"
 }
 
 */
@@ -56,8 +58,8 @@ router.post('/', function(req, res, next) {
 
   console.log(req.body);
 //  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
-  var appl=req.body;
-var q="Insert into applicantTable values ('"+appl.applicantName+"',"+appl.applciantExpectedSalary+",'"+appl.applicantPhotoLink+"','"+appl.applicationStatus+"')";
+  var job=req.body;
+var q="Insert into jobTable values ('"+job.jobTitle+"','"+job.location+"','"+job.category+"','"+job.jobType+"','"+job.jobDescription+"','"+job.jobURL+"')";
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
@@ -71,12 +73,12 @@ console.log(q);
   });
 });
 
-router.post('/(:applicantID)', function(req, res, next) {
+router.post('/(:jobID)', function(req, res, next) {
 
   console.log(req.body);
-//  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
-  var appl=req.body;
-var q="Update applicantTable SET applciantExpectedSalary="+appl.applciantExpectedSalary+", applicantName='"+appl.applicantName+"', applicantPhotoLink='"+appl.applicantPhotoLink+"', applicationStatus='"+appl.applicationStatus+"' where applicantID='"+req.param("applicantID")+"'";
+  var job=req.body;
+  var q="Update jobTable SET jobTitle='"+job.jobTitle+"', location='"+job.location+"',category='"+job.category+"',jobType='"+job.jobType+"',jobDescription='"+job.jobDescription+"',jobURL='"+job.jobURL+"' where jobID='"+req.param("jobID")+"'";
+
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
@@ -90,11 +92,11 @@ console.log(q);
   });
 });
 
-router.delete('/(:applicantID)', function(req, res, next) {
+router.delete('/(:jobID)', function(req, res, next) {
 
 
     util.connectionPool.request() // or: new sql.Request(pool1)
-    .query("DELETE FROM applicantTable WHERE applicantID = '" + req.params.applicantID+"'", (err, result) => {
+    .query("DELETE FROM jobTable WHERE jobID = '" + req.params.jobID+"'", (err, result) => {
       if (err) {
         console.log(err);
         res.sendStatus(500);

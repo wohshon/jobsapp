@@ -23,6 +23,7 @@ util.connectionPool=connectionPool;
 var index = require('./routes/index');
 //var users = require('./routes/users');
 var applicants = require('./routes/applicants');
+var jobs = require('./routes/jobs');
 var app = express();
 
 // view engine setup
@@ -39,6 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/applicants', applicants);
+app.use('/jobs', jobs);
 //app.use('/users', users);
 
 // catch 404 and forward to error handler
