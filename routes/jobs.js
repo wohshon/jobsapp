@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 var data =null;
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from jobTable', (err, result) => {
+  .query('select * from JOBS', (err, result) => {
       console.dir(data);
       if (err) {
         console.log(err);
@@ -25,7 +25,7 @@ var data =null;
 router.get('/(:jobID)', function(req, res, next){
 
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from jobTable WHERE jobID = ' + req.params.jobID, (err, result) => {
+  .query('select * from JOBS WHERE ID = ' + req.params.jobID, (err, result) => {
 
           if (err) {
             console.log(err);
@@ -42,14 +42,16 @@ router.get('/(:jobID)', function(req, res, next){
 });
 
 /*
+INSERT INTO JOBS (ID, TITLE, LOCATION, CATEGORY, TYPE, DESCRIPTION, URL)
+
 {
-  "jobID": null,
-  "jobTitle": "janitor",
-  "location": "apac",
-  "category": "slave category",
-  "jobType" :"slave",
-  "jobDescription": "good job",
-  "jobURL": "http://jobstreet.com/1234"
+  "ID": null,
+  "TITLE": "SSA",
+  "LOCATION": "apac",
+  "CATEGORY": "Techincal",
+  "TYPE" :"Perm",
+  "DESCRIPTION": "good job",
+  "URL": "http://jobstreet.com/1234"
 }
 
 */
@@ -59,7 +61,7 @@ router.post('/', function(req, res, next) {
   console.log(req.body);
 //  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
   var job=req.body;
-var q="Insert into jobTable values ('"+job.jobTitle+"','"+job.location+"','"+job.category+"','"+job.jobType+"','"+job.jobDescription+"','"+job.jobURL+"')";
+var q="Insert into JOBS values ('"+job.TITLE+"','"+job.LOCATION+"','"+job.CATEGORY+"','"+job.TYPE+"','"+job.DESCRIPTION+"','"+job.URL+"')";
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
@@ -68,7 +70,11 @@ console.log(q);
       res.sendStatus(500);
     } else {
       console.log(result.rowsAffected+' rows added');
-      res.sendStatus(200);
+      if (result.rowsAffected == 0) {
+        res.send('records not added');
+      }
+      else
+        res.sendStatus(200);
     }
   });
 });
@@ -77,7 +83,7 @@ router.post('/(:jobID)', function(req, res, next) {
 
   console.log(req.body);
   var job=req.body;
-  var q="Update jobTable SET jobTitle='"+job.jobTitle+"', location='"+job.location+"',category='"+job.category+"',jobType='"+job.jobType+"',jobDescription='"+job.jobDescription+"',jobURL='"+job.jobURL+"' where jobID='"+req.param("jobID")+"'";
+  var q="Update JOBS SET TITLE='"+job.TITLE+"', LOCATION='"+job.LOCATION+"',CATEGORY='"+job.CATEGORY+"',TYPE='"+job.TYPE+"',DESCRIPTION='"+job.DESCRIPTION+"',URL='"+job.URL+"' where ID='"+req.param("jobID")+"'";
 
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
@@ -87,21 +93,27 @@ console.log(q);
       res.sendStatus(500);
     } else {
       console.log(result.rowsAffected+' rows updated');
+      if (result.rowsAffected == 0) {
+        res.send('records not found');
+      }
+      else
       res.sendStatus(200);
     }
   });
 });
 
 router.delete('/(:jobID)', function(req, res, next) {
-
-
     util.connectionPool.request() // or: new sql.Request(pool1)
-    .query("DELETE FROM jobTable WHERE jobID = '" + req.params.jobID+"'", (err, result) => {
+    .query("DELETE FROM JOBS WHERE ID = '" + req.params.jobID+"'", (err, result) => {
       if (err) {
         console.log(err);
         res.sendStatus(500);
       } else {
         console.log(result.rowsAffected+' rows deleted');
+        if (result.rowsAffected == 0) {
+          res.send('records not found');
+        }
+        else
         res.sendStatus(200);
       }
 

@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
 var data =null;
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicantTable', (err, result) => {
+  .query('select * from APPLICANTS', (err, result) => {
       console.dir(data);
       if (err) {
         console.log(err);
@@ -25,7 +25,7 @@ var data =null;
 router.get('/(:applicant_id)', function(req, res, next){
 
   util.connectionPool.request() // or: new sql.Request(pool1)
-  .query('select * from applicantTable WHERE applicantID = ' + req.params.applicant_id, (err, result) => {
+  .query('select * from APPLICANTS WHERE ID = ' + req.params.applicant_id, (err, result) => {
 
           if (err) {
             console.log(err);
@@ -41,13 +41,38 @@ router.get('/(:applicant_id)', function(req, res, next){
 
 });
 
+
+router.get('/jobapplications/(:applicant_id)', function(req, res, next){
+
+  util.connectionPool.request() // or: new sql.Request(pool1)
+  .query('select * from APPLICANTS WHERE ID = ' + req.params.applicant_id, (err, result) => {
+
+          if (err) {
+            console.log(err);
+            res.sendStatus(500);
+          } else {
+            console.dir(result.recordsets)
+            data=result.recordsets[0];
+            console.dir(data);
+            res.send(data);
+    //        res.sendStatus(200);
+          }
+  })
+
+});
+
+
 /*
+INSERT INTO APPLICANTS (ID, NAME, EXPECTED_SALARY, PHOTO_LINK, STATUS, RESUME, JOB_ID)
+
 {
-  "applicantID": null,
-  "applicantName": "john",
-  "applciantExpectedSalary": 12000,
-  "applicantPhotoLink": "http://test.com/123.png",
-  "applicationStatus" :"PENDING"
+  "ID": NULL`,
+  "NAME": "john",
+  "EXPECTED_SALARY": 12000,
+  "PHOTO_LINK": "http://test.com/123.png",
+  "STATUS" :"PENDING",
+  "RESUME" : "this is my CV",
+   "JOB_ID": 001
 }
 
 */
@@ -57,7 +82,7 @@ router.post('/', function(req, res, next) {
   console.log(req.body);
 //  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
   var appl=req.body;
-var q="Insert into applicantTable values ('"+appl.applicantName+"',"+appl.applciantExpectedSalary+",'"+appl.applicantPhotoLink+"','"+appl.applicationStatus+"')";
+var q="Insert into APPLICANTS values ('"+appl.NAME+"',"+appl.EXPECTED_SALARY+",'"+appl.PHOTO_LINK+"','"+appl.STATUS+"','"+appl.RESUME+"',"+appl.JOB_ID+")";
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
@@ -65,7 +90,11 @@ console.log(q);
       console.log(err);
       res.sendStatus(500);
     } else {
-      console.log(result.rowsAffected+' rows added');
+      console.log(result.rowsAffected+' rows created');
+      if (result.rowsAffected == 0) {
+        res.send('records not created');
+      }
+      else
       res.sendStatus(200);
     }
   });
@@ -76,7 +105,7 @@ router.post('/(:applicantID)', function(req, res, next) {
   console.log(req.body);
 //  var q='Update applicants SET first_name="'+req.param('first_name')+'", last_name="'+req.param('last_name')+'", phone="'+req.param('phone')+'", email="'+req.param('email')+'" where applicant_id="'+req.param('applicant_id')+'"';
   var appl=req.body;
-var q="Update applicantTable SET applciantExpectedSalary="+appl.applciantExpectedSalary+", applicantName='"+appl.applicantName+"', applicantPhotoLink='"+appl.applicantPhotoLink+"', applicationStatus='"+appl.applicationStatus+"' where applicantID='"+req.param("applicantID")+"'";
+var q="Update APPLICANTS SET EXPECTED_SALARY="+appl.EXPECTED_SALARY+", NAME='"+appl.NAME+"', PHOTO_LINK='"+appl.PHOTO_LINK+"', STATUS='"+appl.STATUS+"', RESUME='"+appl.RESUME+"', JOB_ID='"+appl.JOB_ID+"' where ID='"+req.param("applicantID")+"'";
 console.log(q);
   util.connectionPool.request() // or: new sql.Request(pool1)
   .query(q, (err, result) => {
@@ -85,6 +114,10 @@ console.log(q);
       res.sendStatus(500);
     } else {
       console.log(result.rowsAffected+' rows updated');
+      if (result.rowsAffected == 0) {
+        res.send('records not found');
+      }
+      else
       res.sendStatus(200);
     }
   });
@@ -94,12 +127,16 @@ router.delete('/(:applicantID)', function(req, res, next) {
 
 
     util.connectionPool.request() // or: new sql.Request(pool1)
-    .query("DELETE FROM applicantTable WHERE applicantID = '" + req.params.applicantID+"'", (err, result) => {
+    .query("DELETE FROM APPLICANTS WHERE ID = '" + req.params.applicantID+"'", (err, result) => {
       if (err) {
         console.log(err);
         res.sendStatus(500);
       } else {
         console.log(result.rowsAffected+' rows deleted');
+        if (result.rowsAffected == 0) {
+          res.send('records not found');
+        }
+        else
         res.sendStatus(200);
       }
 
